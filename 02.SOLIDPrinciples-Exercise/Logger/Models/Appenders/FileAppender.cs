@@ -14,7 +14,7 @@ internal class FileAppender : Appender
     {
         string result = string.Format(this.layout.ToString(), datetime, this.Report, message);
 
-        this.fileSize += result.ToCharArray().Sum(c => c);
+        this.fileSize += result.ToCharArray().Where(c => char.IsLetter(c)).Sum(c => c);
 
         File.AppendAllText("log.txt.", result);
     }
