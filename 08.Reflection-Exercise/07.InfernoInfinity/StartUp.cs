@@ -5,6 +5,7 @@ using System.Linq;
 class StartUp
 {
     static List<IWeapon> weapons = new List<IWeapon>();
+
     static void Main()
     {
         string input;
@@ -13,23 +14,30 @@ class StartUp
         {
             string[] inputTokens = input.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
-            switch (inputTokens[0])
+            try
             {
-                case "Create":
-                    IWeapon weapon = CreateWeapon(inputTokens);
-                    weapons.Add(weapon);
-                    break;
-                case "Add":
-                    AddSocket(inputTokens);
-                    break;
-                case "Remove":
-                    RemoveSocket(inputTokens);
-                    break;
-                case "Print":
-                    PrintWeapon(inputTokens);
-                    break;
-                default:
-                    throw new ArgumentException($"Invalid Command: {inputTokens[0]}!");
+                switch (inputTokens[0])
+                {
+                    case "Create":
+                        IWeapon weapon = CreateWeapon(inputTokens);
+                        weapons.Add(weapon);
+                        break;
+                    case "Add":
+                        AddSocket(inputTokens);
+                        break;
+                    case "Remove":
+                        RemoveSocket(inputTokens);
+                        break;
+                    case "Print":
+                        PrintWeapon(inputTokens);
+                        break;
+                    default:
+                        throw new ArgumentException($"Invalid Command: {inputTokens[0]}!");
+                }
+            }
+            catch (Exception)
+            {
+
             }
         }
     }
@@ -39,6 +47,11 @@ class StartUp
         string weaponName = inputTokens[1];
 
         IWeapon weapon = weapons.First(w => w.Name == weaponName);
+
+        foreach (IGem gem in weapon.Gems.Where(g => g != null))
+        {
+            weapon.Modify(gem);
+        }
 
         Console.WriteLine(weapon);
     }
@@ -88,7 +101,6 @@ class StartUp
         if (socketIndex >= 0 && socketIndex < weapon.Gems.Length)
         {
             weapon.Gems[socketIndex] = gem;
-            weapon.Modify(gem);
         }
     }
 
@@ -110,7 +122,7 @@ class StartUp
             throw new ArgumentException("Invalid Weapon!");
         }
 
-        IWeapon weapon = (IWeapon)Activator.CreateInstance(weaponType, new object[] { rarity, inputTokens[2]});
+        IWeapon weapon = (IWeapon)Activator.CreateInstance(weaponType, new object[] { rarity, inputTokens[2] });
 
         return weapon;
     }
